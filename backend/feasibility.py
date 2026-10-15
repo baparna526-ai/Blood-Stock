@@ -22,9 +22,14 @@ def check_compatible(unit, request):
         return False, f"{unit['blood_group']} cannot be given to a {request['patient_group']} patient"
     return True, "compatible"
 
-def check_free(unit):
+def check_free(unit, world=None):
     if unit["status"] != "AVAILABLE":
         return False, f"unit {unit['unit_id']} is not available (status: {unit['status']})"
+    if world is not None:
+        for entry in world["locked"]:
+            if entry["unit_id"] == unit["unit_id"]:
+                return False, (f"unit {unit['unit_id']} is already locked "
+                               f"for request {entry['request_id']}")
     return True, "unit is free"
 
 def find_route(world, from_id, to_id):
@@ -102,7 +107,7 @@ def is_feasible(unit, request, world, buffer=10):
     if not ok:
         return False, reason
 
-    ok, reason = check_free(unit)
+    ok, reason = check_free(unit, world)
     if not ok:
         return False, reason
 

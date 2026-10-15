@@ -103,3 +103,10 @@ def test_timing_uses_detour_when_road_blocked():
     ok, reason = check_timing(u2, r, w)
     assert ok is True
     assert "minute 65" in reason
+
+def test_locked_unit_is_not_free():
+    w, r, u1, u2 = get(build_world())
+    w["locked"].append({"unit_id": "U02", "request_id": "R02"})
+    ok, reason = is_feasible(u2, r, w)
+    assert ok is False
+    assert "locked" in reason    
