@@ -38,6 +38,7 @@ def make_units():
     hospital_ids = ["A", "B", "C", "D", "E"]
     groups  = ["O+", "A+", "B+", "AB+", "O-", "A-", "B-", "AB-"]
     weights = [38, 27, 8, 2, 7, 6, 2, 1]
+    compatible_with_a_pos = {"O-", "O+", "A-", "A+"}
 
     units = [
         {"unit_id": "U01", "component": "RBC", "blood_group": "A+",
@@ -47,11 +48,18 @@ def make_units():
     ]
 
     for number in range(3, 31):
+        bg = rng.choices(groups, weights=weights)[0]
+        # If the unit is compatible with A+, pick from hospitals other than 'C'
+        if bg in compatible_with_a_pos:
+            hosp = rng.choice(["A", "B", "D", "E"])
+        else:
+            hosp = rng.choice(hospital_ids)
+
         units.append({
             "unit_id": f"U{number:02d}",
             "component": "RBC",
-            "blood_group": rng.choices(groups, weights=weights)[0],
-            "hospital_id": rng.choice(hospital_ids),
+            "blood_group": bg,
+            "hospital_id": hosp,
             "expires_at": rng.randint(30, 720),
             "status": "AVAILABLE",
         })
