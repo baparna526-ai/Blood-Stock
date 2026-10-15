@@ -110,22 +110,3 @@ def test_locked_unit_is_not_free():
     ok, reason = is_feasible(u2, r, w)
     assert ok is False
     assert "locked" in reason    
-
-    def is_feasible(unit, request, world, buffer=10):
-    ok, reason = check_compatible(unit, request)
-    if not ok:
-        return False, reason
-
-    ok, reason = check_free(unit, world)
-    if not ok:
-        return False, reason
-
-    ok, reason = check_route(unit, request, world)
-    if not ok:
-        return False, reason
-
-    ok, reason = check_timing(unit, request, world, buffer)
-    if not ok:
-        return False, reason
-
-    return True, reason
