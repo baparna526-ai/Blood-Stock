@@ -56,3 +56,22 @@ def make_units():
             "status": "AVAILABLE",
         })
     return units
+
+def make_requests():
+    return [
+        {"request_id": "R01", "hospital_id": "C", "component": "RBC",
+         "patient_group": "A+", "units_needed": 1,
+         "priority": "URGENT", "needed_by": 90, "status": "OPEN"},
+        {"request_id": "R02", "hospital_id": "C", "component": "RBC",
+         "patient_group": "O+", "units_needed": 1,
+         "priority": "ROUTINE", "needed_by": 300, "status": "OPEN"},
+        {"request_id": "R03", "hospital_id": "D", "component": "RBC",
+         "patient_group": "B+", "units_needed": 2,
+         "priority": "ROUTINE", "needed_by": 400, "status": "OPEN"},
+        {"request_id": "R04", "hospital_id": "E", "component": "RBC",
+         "patient_group": "O-", "units_needed": 1,
+         "priority": "URGENT", "needed_by": 150, "status": "OPEN"},
+        {"request_id": "R05", "hospital_id": "B", "component": "RBC",
+         "patient_group": "A-", "units_needed": 1,
+         "priority": "ROUTINE", "needed_by": 500, "status": "OPEN"},
+    ]
