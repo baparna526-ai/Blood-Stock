@@ -19,3 +19,8 @@ def check_compatible(unit, request):
     if unit["blood_group"] not in RBC_DONORS_FOR[request["patient_group"]]:
         return False, f"{unit['blood_group']} cannot be given to a {request['patient_group']} patient"
     return True, "compatible"
+
+def check_free(unit):
+    if unit["status"] != "AVAILABLE":
+        return False, f"unit {unit['unit_id']} is not available (status: {unit['status']})"
+    return True, "unit is free"
