@@ -1,4 +1,6 @@
 # backend/feasibility.py
+import heapq
+
 
 # For each patient group, the donor groups whose red cells are safe to give.
 RBC_DONORS_FOR = {
@@ -32,14 +34,42 @@ def find_route(world, from_id, to_id):
     return None
 
 
+def find_best_path(world, start, end):
+    """Fastest open path. Returns (minutes, [hospital ids]) or None."""
+    if start == end:
+        return 0, [start]
+
+    best = {start: 0}
+    came_from = {}
+    queue = [(0, start)]
+
+    while queue:
+        minutes, here = heapq.heappop(queue)
+        if here == end:
+            path = [end]
+            while path[-1] != start:
+                path.append(came_from[path[-1]])
+            path.reverse()
+            return minutes, path
+        if minutes > best.get(here, float("inf")):
+            continue
+        for route in world["travel"]:
+            if route["from_id"] != here or route["blocked"]:
+                continue
+            new_minutes = minutes + route["minutes"]
+            if new_minutes < best.get(route["to_id"], float("inf")):
+                best[route["to_id"]] = new_minutes
+                came_from[route["to_id"]] = here
+                heapq.heappush(queue, (new_minutes, route["to_id"]))
+
+    return None
+
 def check_route(unit, request, world):
     start = unit["hospital_id"]
     end = request["hospital_id"]
-    if start == end:
-        return True, "unit is already at the requesting hospital"
-    route = find_route(world, start, end)
-    if route is None:
-        return False, f"no route from {start} to {end}"
-    if route["blocked"]:
-        return False, f"route from {start} to {end} is blocked"
-    return True, f"route {start} to {end} is open"
+    result = find_best_path(world, start, end)
+    if result is None:
+        return False, f"no open route from {start} to {end}"
+    minutes, path = result
+    return True, f"best route {' -> '.join(path)} takes {minutes} min"
+
