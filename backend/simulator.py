@@ -1,4 +1,5 @@
 # backend/simulator.py
+import random
 
 def make_hospitals():
     return [
@@ -30,3 +31,28 @@ def make_travel_times():
         routes.append({"from_id": to_id, "to_id": from_id,
                        "minutes": minutes, "blocked": False})
     return routes
+
+def make_units():
+    rng = random.Random(42)
+
+    hospital_ids = ["A", "B", "C", "D", "E"]
+    groups  = ["O+", "A+", "B+", "AB+", "O-", "A-", "B-", "AB-"]
+    weights = [38, 27, 8, 2, 7, 6, 2, 1]
+
+    units = [
+        {"unit_id": "U01", "component": "RBC", "blood_group": "A+",
+         "hospital_id": "B", "expires_at": 40, "status": "AVAILABLE"},
+        {"unit_id": "U02", "component": "RBC", "blood_group": "A+",
+         "hospital_id": "A", "expires_at": 360, "status": "AVAILABLE"},
+    ]
+
+    for number in range(3, 31):
+        units.append({
+            "unit_id": f"U{number:02d}",
+            "component": "RBC",
+            "blood_group": rng.choices(groups, weights=weights)[0],
+            "hospital_id": rng.choice(hospital_ids),
+            "expires_at": rng.randint(30, 720),
+            "status": "AVAILABLE",
+        })
+    return units
