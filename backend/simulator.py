@@ -75,3 +75,13 @@ def make_requests():
          "patient_group": "A-", "units_needed": 1,
          "priority": "ROUTINE", "needed_by": 500, "status": "OPEN"},
     ]
+
+def build_world():
+    return {
+        "now": 0,
+        "hospitals": make_hospitals(),
+        "travel": make_travel_times(),
+        "units": make_units(),
+        "requests": make_requests(),
+        "locked": [],
+    }
