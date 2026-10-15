@@ -73,3 +73,26 @@ def check_route(unit, request, world):
     minutes, path = result
     return True, f"best route {' -> '.join(path)} takes {minutes} min"
 
+def check_timing(unit, request, world, buffer=10):
+    result = find_best_path(world, unit["hospital_id"], request["hospital_id"])
+    if result is None:
+        return False, "no open route, so there is no arrival time"
+    travel, path = result
+    arrival = world["now"] + travel
+
+    expiry_spare = unit["expires_at"] - arrival
+    if expiry_spare < 0:
+        return False, (f"would expire {-expiry_spare} min before arrival "
+                       f"(arrives at minute {arrival}, expires at minute {unit['expires_at']})")
+    if expiry_spare < buffer:
+        return False, f"arrives only {expiry_spare} min before expiry, buffer needed is {buffer}"
+
+    deadline_spare = request["needed_by"] - arrival
+    if deadline_spare < 0:
+        return False, (f"would arrive {-deadline_spare} min after the deadline "
+                       f"(arrives at minute {arrival}, needed by minute {request['needed_by']})")
+    if deadline_spare < buffer:
+        return False, f"arrives only {deadline_spare} min before the deadline, buffer needed is {buffer}"
+
+    return True, (f"arrives at minute {arrival}: {expiry_spare} min before expiry, "
+                  f"{deadline_spare} min before deadline")
