@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HemoSync – Sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--cherry:#d2042d;--red:#b3122b;--maroon:#6b0f1a;--beige:#f7f0e8;--blush:#fde6ea;--ink:#2b0b11;--line:#ecd3d6;--mute:#7d5a60}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Poppins,system-ui,sans-serif;color:var(--ink);background:var(--beige);position:relative;display:grid;grid-template-columns:1.15fr 1fr;isolation:isolate}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:url(login-bg.png) center/cover no-repeat;opacity:.5}
+body::after{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(110deg,rgba(107,15,26,.9) 0%,rgba(179,18,43,.7) 45%,rgba(253,230,234,.72) 100%)}
+.brand{display:flex;flex-direction:column;justify-content:center;padding:48px 56px;color:#fff}
+.logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:26px;margin-bottom:36px}
+.logo svg{width:44px;height:44px}
+.brand h2{font-size:38px;line-height:1.2;margin:0 0 14px;max-width:460px}
+.brand p{margin:0;max-width:400px;line-height:1.7;color:#ffe9ed}
+main{display:flex;align-items:center;justify-content:center;padding:32px}
+form{width:100%;max-width:380px;background:rgba(255,250,246,.93);border:1px solid #fff;border-radius:20px;padding:34px 30px;box-shadow:0 20px 50px rgba(107,15,26,.35)}
+h1{font-size:28px;margin:0 0 4px;color:var(--maroon)}
+.sub{color:var(--mute);margin:0 0 24px}
+label{display:block;font-weight:500;font-size:14px;margin-bottom:6px}
+input,select{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:12px;font:inherit;background:#fff;margin-bottom:16px;color:var(--ink)}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--cherry);outline-offset:2px}
+button{width:100%;padding:13px;border:0;border-radius:12px;background:var(--cherry);color:#fff;font:600 16px Poppins,sans-serif;cursor:pointer}
+button:hover{background:var(--maroon)}
+.err{color:var(--red);font-size:14px;min-height:20px;margin:0 0 12px}
+.hint{font-size:13px;color:var(--mute);margin:16px 0 0}
+@media(max-width:860px){body{grid-template-columns:1fr}.brand{padding:28px 24px 8px}.brand h2{font-size:26px}.brand p{display:none}.logo{margin-bottom:16px}}
+</style>
+</head>
+<body>
+<section class="brand">
+  <div class="logo"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="92" fill="#fde6ea"/><path d="M100 28C100 28 52 90 52 122a48 48 0 0 0 96 0C148 90 100 28 100 28z" fill="#d2042d"/><rect x="88" y="98" width="24" height="8" rx="3" fill="#fff"/><rect x="96" y="90" width="8" height="24" rx="3" fill="#fff"/></svg>HemoSync</div>
+  <h2>Right blood, right place, before it expires</h2>
+  <p>Plan blood allocation across your hospital network in one view.</p>
+</section>
+<main>
+  <form id="f" novalidate>
+    <h1>Welcome back</h1>
+    <p class="sub">Sign in to HemoSync</p>
+    <label for="role">Your role</label>
+    <select id="role"><option>Blood bank officer</option><option>Hospital coordinator</option><option>Network administrator</option></select>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="username" placeholder="you@hospital.in">
+    <label for="pw">Password</label>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Your password">
+    <p class="err" id="err" role="alert"></p>
+    <button type="submit">Sign in</button>
+    <p class="hint">Demo: any email and a password of 4+ characters.</p>
+  </form>
+</main>
+<script>
+document.getElementById('f').addEventListener('submit',function(e){
+  e.preventDefault();
+  var em=document.getElementById('email').value.trim(),pw=document.getElementById('pw').value,err=document.getElementById('err');
+  if(!/^\S+@\S+\.\S+$/.test(em)){err.textContent='Enter a valid email address.';return}
+  if(pw.length<4){err.textContent='Password must be at least 4 characters.';return}
+  try{sessionStorage.setItem('bs_user',em)}catch(x){}
+  location.href='dashboard.html';
+});
+</script>
+</body>
+</html>

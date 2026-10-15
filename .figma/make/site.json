@@ -1,0 +1,10 @@
+{
+  "description": "Enables hospital staff to efficiently allocate perishable blood components across hospitals, minimizing waste and ensuring timely transfers before expiry.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

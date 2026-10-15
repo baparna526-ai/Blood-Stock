@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HemoSync – Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--cherry:#d2042d;--red:#b3122b;--maroon:#6b0f1a;--beige:#f7f0e8;--blush:#fde6ea;--ink:#2b0b11;--line:#ecd3d6;--mute:#7d5a60}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins,system-ui,sans-serif;color:var(--ink);background:var(--beige);display:grid;grid-template-columns:184px 1fr;min-height:100vh}
+aside{background:var(--maroon);color:#fff;padding:14px 8px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;padding:0 6px 14px}
+.logo svg{width:24px;height:24px}
+nav{display:grid;gap:2px;flex:1;align-content:start}
+nav button{display:block;width:100%;text-align:left;border:0;background:none;color:#f6cfd6;padding:8px 10px;border-radius:8px;font:500 12.5px Poppins,sans-serif;cursor:pointer}
+nav button:hover{background:rgba(255,255,255,.1)}
+nav button[aria-current=page]{background:var(--cherry);color:#fff}
+.me{font-size:12px;color:#f6cfd6;padding:10px 8px;border-top:1px solid rgba(255,255,255,.2);word-break:break-all}
+.me a{color:#fff;font-weight:600;text-decoration:none;display:block;margin-top:6px}
+button:focus-visible,[role=tab]:focus-visible,a:focus-visible{outline:3px solid #fff;outline-offset:2px}
+main{padding:18px 22px;max-width:1400px;width:100%}
+h1{margin:0;font-size:22px;color:var(--maroon)}
+.sub{margin:2px 0 20px;color:var(--mute);font-size:14px}
+.card{background:#fff;border:2px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+h3{margin:0 0 12px;font-size:16px;color:var(--maroon)}
+.ov{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+.col{display:grid;gap:20px;align-content:start}
+.full{grid-column:1/-1}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kpi{border-radius:14px;padding:14px;color:#fff}
+.kpi b{display:block;font-size:26px}
+.kpi span{font-size:13px}
+.k1{background:var(--cherry)}.k2{background:var(--maroon)}.k3{background:#c93a55}.k4{background:#8c2a3b}
+.ctrl label{display:flex;justify-content:space-between;font-size:14px;font-weight:500;margin:10px 0 4px}
+.ctrl input[type=range]{width:100%;accent-color:var(--cherry)}
+.ctrl select{width:100%;padding:9px;border:2px solid var(--line);border-radius:10px;font:inherit}
+.tg{display:flex;gap:8px;align-items:center;font-size:14px;margin:12px 0}
+button.run{width:100%;padding:11px;border:0;border-radius:10px;background:var(--cherry);color:#fff;font:600 15px Poppins,sans-serif;cursor:pointer}
+button.run:hover{background:var(--maroon)}
+svg.map{width:100%;height:auto;background:var(--blush);border-radius:12px}
+.ch{width:100%;height:auto}
+.tl{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
+[role=tab]{border:0;background:none;padding:10px 16px;font:500 15px Poppins,sans-serif;color:var(--mute);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+[role=tab][aria-selected=true]{color:var(--cherry);border-color:var(--cherry)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:500}
+.pill{padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+.u-high{background:var(--cherry)}.u-med{background:#8c2a3b}.u-low{background:#7d6469}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%}
+.lg{display:flex;gap:16px;font-size:13px;color:var(--mute);margin:0 0 8px;flex-wrap:wrap}
+.lg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.pre{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.pre button{text-align:left;background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px;font:inherit;cursor:pointer;color:var(--ink)}
+.pre button b{display:block;font-size:14px}.pre button span{font-size:12px;color:var(--mute)}
+.pre button[aria-pressed=true]{border-color:var(--cherry);background:var(--blush)}
+.big{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.big b{font-size:28px;color:var(--cherry)}.big span{display:block;font-size:12px;color:var(--mute)}
+.hn{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:20px}
+.hn .card{padding:14px;font-size:13px}.hn b{color:var(--maroon);font-size:15px}
+.kr{grid-template-columns:repeat(4,1fr);margin-bottom:14px}.kr .kpi{padding:10px 14px}.kr .kpi b{font-size:22px}
+.ovx{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.bar2{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.bar2 button{border:2px solid var(--line);background:#fff;color:var(--maroon);border-radius:10px;padding:8px 16px;font:600 13px Poppins,sans-serif;cursor:pointer}
+.bar2 button:hover{background:var(--blush);border-color:var(--cherry)}
+#lm{height:520px;border-radius:12px;background:var(--blush);z-index:0}
+.btn{border:0;background:var(--cherry);color:#fff;border-radius:10px;padding:8px 14px;font:600 13px Poppins,sans-serif;cursor:pointer}
+.btn:hover{background:var(--maroon)}.btn.ghost{background:#fff;color:var(--maroon);border:2px solid var(--line)}
+dialog{border:0;border-radius:16px;padding:0;max-width:780px;width:92%;font-family:inherit;color:var(--ink)}
+dialog::backdrop{background:rgba(43,11,17,.55)}
+.dh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;border-bottom:2px solid var(--line)}
+.db{padding:16px 20px;max-height:65vh;overflow:auto}
+main button:focus-visible,main a:focus-visible,dialog button:focus-visible,[role=tab]:focus-visible{outline:3px solid var(--cherry);outline-offset:2px}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.hd .sub{margin-bottom:14px}
+.btn.dlr{padding:10px 18px;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.leaflet-tooltip.hs-tip{padding:0;border:2px solid var(--line);border-radius:14px;box-shadow:0 10px 28px rgba(107,15,26,.28);white-space:normal;font-family:Poppins,system-ui,sans-serif;color:var(--ink)}
+.leaflet-tooltip-top.hs-tip:before{border-top-color:var(--line)}
+.tt{width:236px;padding:12px 14px}
+.tt .tn{display:block;font-size:15px;color:var(--maroon);margin-bottom:6px}
+.tt .tk{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 4px}
+.tt .tk b{display:block;font-size:20px;color:var(--cherry);line-height:1.1}
+.tt .tk span{font-size:11px;color:var(--mute)}
+.tt .tr{display:flex;align-items:center;gap:8px;font-size:12px;margin:6px 0}
+.tt .tr span{width:58px}.tt .tr .bar{flex:1;min-width:0}
+.tt small{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:11px;color:var(--mute);line-height:1.5}
+@media(max-width:860px){body{grid-template-columns:1fr}aside{position:static;height:auto;padding:12px}nav{display:flex;overflow-x:auto}nav button{white-space:nowrap;width:auto}.me{display:none}main{padding:16px}.ov,.two,.ovx{grid-template-columns:1fr}.kr{grid-template-columns:1fr 1fr}#lm{height:360px}.logo{padding-bottom:10px}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="92" fill="#fde6ea"/><path d="M100 28C100 28 52 90 52 122a48 48 0 0 0 96 0C148 90 100 28 100 28z" fill="#d2042d"/><rect x="88" y="98" width="24" height="8" rx="3" fill="#fff"/><rect x="96" y="90" width="8" height="24" rx="3" fill="#fff"/></svg>HemoSync</div>
+  <nav id="nav" aria-label="Pages"></nav>
+  <div class="me"><span id="who"></span><a href="index.html">Sign out</a></div>
+</aside>
+<main id="main"></main>
+<dialog id="dlg" aria-labelledby="dt"><div class="dh"><h3 id="dt" style="margin:0"></h3><span><button class="btn" id="dl">Download CSV</button> <button class="btn ghost" id="dx">Close</button></span></div><div class="db" id="db"></div></dialog>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+var H=[
+ {n:'Pink City General',la:26.9239,ln:75.8267,x:300,y:190,s:{'Red cells':58,'Platelets':14,'Plasma':30},exp:6},
+ {n:'Amber Fort Medical',la:26.9855,ln:75.8513,x:470,y:80,s:{'Red cells':12,'Platelets':3,'Plasma':9},exp:2},
+ {n:'Malviya Nagar Hospital',la:26.8553,ln:75.8103,x:220,y:290,s:{'Red cells':44,'Platelets':20,'Plasma':26},exp:9},
+ {n:'Sanganer Care',la:26.82,ln:75.79,x:90,y:320,s:{'Red cells':9,'Platelets':2,'Plasma':5},exp:1},
+ {n:'Vaishali Health',la:26.9124,ln:75.74,x:130,y:150,s:{'Red cells':35,'Platelets':11,'Plasma':22},exp:5},
+ {n:'Jhotwara Clinic',la:26.95,ln:75.75,x:260,y:60,s:{'Red cells':16,'Platelets':4,'Plasma':8},exp:3}
+];
+var R=[[0,1],[0,2],[0,4],[0,5],[2,3],[4,5],[4,3]];
+var REC=[
+ {f:0,t:1,c:'Red cells',u:10,urg:'High',eta:35},
+ {f:2,t:3,c:'Platelets',u:6,urg:'High',eta:28},
+ {f:0,t:5,c:'Plasma',u:5,urg:'Medium',eta:30},
+ {f:4,t:3,c:'Red cells',u:8,urg:'Medium',eta:40},
+ {f:2,t:1,c:'Platelets',u:3,urg:'Low',eta:45}
+];
+var PG=[['ov','Overview','Hover over a hospital to see its stock. Download the report for full details.'],['inv','Blood Inventory','What each hospital holds and how soon it expires'],['al','Allocation Planner','Recommended moves for the current scenario'],['tr','Transfers','Progress of each planned delivery'],['hn','Hospital Network','Hospitals, routes and stock levels'],['dm','Demand & Requests','What hospitals need compared with what is available'],['sim','Simulation Lab','Change the network and see the plan adapt'],['rp','Reports & Analytics','Manual baseline compared with the HemoSync plan']];
+var PRE=[['Current network','No disruption, baseline',0,false],['Transport failure','Block the Amber Fort route',0,true],['Demand spike','+30% demand surge',30,false],['Spike and blocked route','+30% demand, route blocked',30,true]];
+var COMP=['Red cells','Platelets','Plasma'],CC=['#d2042d','#6b0f1a','#f2a0b0'];
+var TS=['In transit','Dispatched','Scheduled','Scheduled','Pending'],TP=[70,45,20,10,0];
+var st={sel:0,surge:0,comp:'All',cut:false,tab:'rec',page:'ov'};
+var $=function(i){return document.getElementById(i)};
+try{$('who').textContent=sessionStorage.getItem('bs_user')||''}catch(e){}
+
+function map(){
+  var s='';
+  R.forEach(function(r){
+    var b=st.cut&&(r[0]==1||r[1]==1);
+    s+='<line x1="'+H[r[0]].x+'" y1="'+H[r[0]].y+'" x2="'+H[r[1]].x+'" y2="'+H[r[1]].y+'" stroke="'+(b?'#d2042d':'#6b0f1a')+'" stroke-width="3" '+(b?'stroke-dasharray="6 6"':'')+' opacity=".55"/>';
+  });
+  H.forEach(function(h){
+    var low=h.s['Red cells']<20;
+    s+='<circle cx="'+h.x+'" cy="'+h.y+'" r="20" fill="'+(low?'#6b0f1a':'#e8546e')+'"/><rect x="'+(h.x-3)+'" y="'+(h.y-10)+'" width="6" height="20" rx="2" fill="#fff"/><rect x="'+(h.x-10)+'" y="'+(h.y-3)+'" width="20" height="6" rx="2" fill="#fff"/><text x="'+h.x+'" y="'+(h.y+38)+'" text-anchor="middle" font-size="12" font-weight="600" fill="#2b0b11">'+h.n+'</text>';
+  });
+  return '<svg class="map" viewBox="0 0 600 380" role="img" aria-label="Map of six hospitals and delivery routes">'+s+'</svg>';
+}
+function plan(all){
+  var f=1+st.surge/100;
+  return REC.filter(function(r){return all||st.comp=='All'||r.c==st.comp}).map(function(r){
+    var b=st.cut&&(r.t==1||r.f==1);
+    return {f:r.f,t:r.t,c:r.c,u:Math.round(r.u*f),urg:r.urg,eta:r.eta+(b?25:0)};
+  });
+}
+function met(l){
+  var tot=l.reduce(function(a,r){return a+r.u},0),eta=l.length?Math.round(l.reduce(function(a,r){return a+r.eta},0)/l.length):0;
+  return {tot:tot,eta:eta,ful:Math.max(60,Math.round(97-st.surge*0.35-(st.cut?4:0))),wst:Math.max(1,Math.round(3+st.surge*0.05+(st.cut?1:0)))};
+}
+function kpiH(m){
+  return '<div class="kpi k1"><b>'+m.ful+'%</b><span>Requests fulfilled</span></div><div class="kpi k2"><b>'+m.wst+'%</b><span>Units wasted</span></div><div class="kpi k3"><b>'+m.eta+' min</b><span>Average delivery time</span></div><div class="kpi k4"><b>'+m.tot+'</b><span>Units to move</span></div>';
+}
+function base(m){return {ful:Math.max(50,m.ful-14),wst:m.wst+9,eta:m.eta+22}}
+function pill(u){return '<span class="pill '+(u=='High'?'u-high':u=='Medium'?'u-med':'u-low')+'">'+u+'</span>'}
+function tabH(k,l,m){
+  var h;
+  if(k=='rec'){
+    h='<table><tr><th>From</th><th>To</th><th>Component</th><th>Units</th><th>Urgency</th><th>Delivery</th></tr>';
+    l.forEach(function(r){h+='<tr><td>'+H[r.f].n+'</td><td>'+H[r.t].n+'</td><td>'+r.c+'</td><td>'+r.u+'</td><td>'+pill(r.urg)+'</td><td>'+r.eta+' min</td></tr>'});
+    if(!l.length)h+='<tr><td colspan="6">No moves needed for this component.</td></tr>';
+    return h+'</table>';
+  }
+  if(k=='inv'){
+    h='<table><tr><th>Hospital</th><th>Red cells</th><th>Platelets</th><th>Plasma</th><th>Soonest expiry</th></tr>';
+    H.forEach(function(x){h+='<tr><td>'+x.n+'</td><td>'+x.s['Red cells']+'</td><td>'+x.s.Platelets+'</td><td>'+x.s.Plasma+'</td><td>'+x.exp+' days</td></tr>'});
+    return h+'</table>';
+  }
+  var b=base(m);
+  var row=function(n,a,c,u,max){return '<tr><td>'+n+'</td><td><div class="bar"><i style="width:'+a/max*100+'%;background:#b9a0a5"></i></div>'+a+u+'</td><td><div class="bar"><i style="width:'+c/max*100+'%;background:#d2042d"></i></div>'+c+u+'</td></tr>'};
+  return '<table><tr><th>Measure</th><th>Manual baseline</th><th>HemoSync plan</th></tr>'+row('Requests fulfilled',b.ful,m.ful,'%',100)+row('Units wasted',b.wst,m.wst,'%',20)+row('Delivery time',b.eta,m.eta,' min',90)+'</table>';
+}
+function leg(n,c){return '<div class="lg">'+n.map(function(x,i){return '<span><i style="background:'+c[i]+'"></i>'+x+'</span>'}).join('')+'</div>'}
+function vb(lb,se,mx){
+  var W=560,Y=220,p=36,bw=(W-p*2)/lb.length,g=Math.min(30,bw/(se.length+1)),s='';
+  for(var i=0;i<=4;i++){var y=Y-i*Y/4+10;s+='<line x1="'+p+'" x2="'+(W-p)+'" y1="'+y+'" y2="'+y+'" stroke="#ecd3d6"/><text x="'+(p-6)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="#7d5a60">'+Math.round(mx*i/4)+'</text>'}
+  lb.forEach(function(l,i){
+    se.forEach(function(q,j){var h=q.v[i]/mx*Y,x=p+i*bw+(bw-se.length*g)/2+j*g;s+='<rect x="'+x+'" y="'+(Y+10-h)+'" width="'+(g-3)+'" height="'+h+'" rx="3" fill="'+q.c+'"><title>'+q.n+': '+q.v[i]+'</title></rect>'});
+    s+='<text x="'+(p+i*bw+bw/2)+'" y="'+(Y+30)+'" text-anchor="middle" font-size="11" fill="#2b0b11">'+l+'</text>';
+  });
+  return '<svg class="ch" viewBox="0 0 '+W+' '+(Y+40)+'" role="img" aria-label="Bar chart">'+s+'</svg>';
+}
+function snap(m){
+  var b=base(m),rows=[['Fulfilment %',b.ful,m.ful],['Wastage %',b.wst,m.wst],['Avg delivery (min)',b.eta,m.eta]],s='',L=130,P=400;
+  for(var i=0;i<=4;i++){var x=L+i*P/4;s+='<line x1="'+x+'" x2="'+x+'" y1="10" y2="250" stroke="#ecd3d6"/><text x="'+x+'" y="272" text-anchor="middle" font-size="11" fill="#7d5a60">'+i*25+'</text>'}
+  rows.forEach(function(r,i){
+    var y=26+i*80;
+    s+='<text x="'+(L-8)+'" y="'+(y+22)+'" text-anchor="end" font-size="12" fill="#2b0b11">'+r[0]+'</text><rect x="'+L+'" y="'+y+'" width="'+Math.min(r[1],100)/100*P+'" height="14" rx="3" fill="#e3c4ca"/><rect x="'+L+'" y="'+(y+18)+'" width="'+Math.min(r[2],100)/100*P+'" height="14" rx="3" fill="#d2042d"/><text x="'+(L+Math.min(r[1],100)/100*P+6)+'" y="'+(y+12)+'" font-size="11" fill="#7d5a60">'+r[1]+'</text><text x="'+(L+Math.min(r[2],100)/100*P+6)+'" y="'+(y+30)+'" font-size="11" font-weight="600" fill="#6b0f1a">'+r[2]+'</text>';
+  });
+  return leg(['Manual baseline','HemoSync plan'],['#e3c4ca','#d2042d'])+'<svg class="ch" viewBox="0 0 560 285" role="img" aria-label="Baseline compared with plan">'+s+'</svg>';
+}
+function ln(){
+  var W=560,Y=200,p=40,xs=[0,10,20,30,40,50,60],a='',b='',s='';
+  for(var i=0;i<=3;i++){var y=Y-i*Y/3+10;s+='<line x1="'+p+'" x2="'+(W-20)+'" y1="'+y+'" y2="'+y+'" stroke="#ecd3d6"/><text x="'+(p-6)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="#7d5a60">'+(40+i*20)+'%</text>'}
+  xs.forEach(function(v,i){
+    var x=p+i*(W-20-p)/6,f=Math.max(60,Math.round(97-v*.35)),m=Math.max(50,f-14);
+    a+=x+','+(Y+10-(f-40)/60*Y)+' ';b+=x+','+(Y+10-(m-40)/60*Y)+' ';
+    s+='<text x="'+x+'" y="'+(Y+30)+'" text-anchor="middle" font-size="11" fill="#2b0b11">+'+v+'%</text>';
+  });
+  return leg(['Manual baseline','HemoSync plan'],['#b9a0a5','#d2042d'])+'<svg class="ch" viewBox="0 0 560 240" role="img" aria-label="Fulfilment as demand rises">'+s+'<polyline points="'+b+'" fill="none" stroke="#b9a0a5" stroke-width="3"/><polyline points="'+a+'" fill="none" stroke="#d2042d" stroke-width="3"/></svg>';
+}
+function ctrl(){
+  return '<section class="card ctrl"><h3>Scenario</h3><label for="surge">Demand surge <span id="sv">'+st.surge+'%</span></label><input type="range" id="surge" min="0" max="60" step="5" value="'+st.surge+'"><label for="comp">Component</label><select id="comp"><option value="All">All components</option><option>Red cells</option><option>Platelets</option><option>Plasma</option></select><div class="tg"><input type="checkbox" id="cut"'+(st.cut?' checked':'')+'><label for="cut" style="margin:0">Block the Amber Fort route</label></div><button class="run" id="run">Run plan</button></section>';
+}
+function card(t,b,c){return '<section class="card '+(c||'')+'"><h3>'+t+'</h3>'+b+'</section>'}
+function short(){return H.map(function(h){return h.n.split(' ')[0]})}
+function pOv(l,m){
+  return card('Hospital network – Jaipur',leg(['Stable stock','Low red cells','Blocked route'],['#e8546e','#6b0f1a','#d2042d'])+'<div id="lm" style="height:calc(100vh - 235px);min-height:460px"></div>');
+}
+function pInv(){
+  var se=COMP.map(function(c,i){return {n:c,c:CC[i],v:H.map(function(h){return h.s[c]})}}),t='<table><tr><th>Hospital</th><th>Total units</th><th>Soonest expiry</th></tr>';
+  H.forEach(function(h){var n=COMP.reduce(function(a,c){return a+h.s[c]},0);t+='<tr><td>'+h.n+'</td><td>'+n+'</td><td><div class="bar"><i style="width:'+h.exp*10+'%;background:'+(h.exp<=3?'#d2042d':'#8c2a3b')+'"></i></div>'+h.exp+' days</td></tr>'});
+  return card('Units in stock by hospital',leg(COMP,CC)+vb(short(),se,60))+'<br>'+card('Stock and expiry',tabH('inv')+'<br><div class="tw">'+t+'</table></div>');
+}
+function pAl(l,m){
+  var se=[{n:'Units to move',c:'#d2042d',v:COMP.map(function(c){return l.filter(function(r){return r.c==c}).reduce(function(a,r){return a+r.u},0)})}];
+  return '<div class="two">'+card('Units to move by component',vb(COMP,se,Math.max(10,Math.ceil(Math.max.apply(null,se[0].v)/5)*5)))+card('Plan summary','<div class="kpis">'+kpiH(m)+'</div>')+'</div>'+card('Recommended moves','<div class="tw">'+tabH('rec',l,m)+'</div><p class="sub">Change surge, component or route on the Overview or Simulation Lab page.</p>');
+}
+function pTr(l){
+  var t='<table><tr><th>From</th><th>To</th><th>Component</th><th>Units</th><th>Status</th><th>Progress</th></tr>';
+  l.forEach(function(r){var i=REC.findIndex(function(q){return q.f==r.f&&q.t==r.t&&q.c==r.c});t+='<tr><td>'+H[r.f].n+'</td><td>'+H[r.t].n+'</td><td>'+r.c+'</td><td>'+r.u+'</td><td>'+TS[i]+'</td><td><div class="bar"><i style="width:'+TP[i]+'%;background:#d2042d"></i></div></td></tr>'});
+  if(!l.length)t+='<tr><td colspan="6">No transfers for this component.</td></tr>';
+  return card('Planned transfers','<div class="tw">'+t+'</table></div>');
+}
+function pHn(){
+  var c='';
+  H.forEach(function(h,i){var n=COMP.reduce(function(a,k){return a+h.s[k]},0),rt=R.filter(function(r){return r[0]==i||r[1]==i}).length;c+='<div class="card"><b>'+h.n+'</b><br>'+n+' units · '+rt+' routes<br>Soonest expiry '+h.exp+' days<br>'+(h.s['Red cells']<20?pill('High')+' Low red cells':'Stock healthy')+'</div>'});
+  return '<div class="hn" style="margin-top:0">'+c+'</div>';
+}
+function pDm(l){
+  var f=1+st.surge/100,se=[{n:'Demand',c:'#6b0f1a',v:COMP.map(function(c){return Math.round({'Red cells':120,'Platelets':38,'Plasma':60}[c]*f)})},{n:'Stock',c:'#f2a0b0',v:COMP.map(function(c){return H.reduce(function(a,h){return a+h.s[c]},0)})}];
+  var t='<table><tr><th>Requesting hospital</th><th>Component</th><th>Units</th><th>Urgency</th></tr>';
+  l.forEach(function(r){t+='<tr><td>'+H[r.t].n+'</td><td>'+r.c+'</td><td>'+r.u+'</td><td>'+pill(r.urg)+'</td></tr>'});
+  return card('Demand compared with stock',leg(['Demand','Stock'],['#6b0f1a','#f2a0b0'])+vb(COMP,se,200))+'<br>'+card('Open requests','<div class="tw">'+t+'</table></div>');
+}
+function pSim(l,m){
+  var p='<div class="pre">'+PRE.map(function(x,i){return '<button data-pre="'+i+'" aria-pressed="'+(st.surge==x[2]&&st.cut==x[3])+'"><b>'+x[0]+'</b><span>'+x[1]+'</span></button>'}).join('')+'</div>',b=base(m);
+  return '<div class="two">'+card('Run a scenario',p)+card('Evaluation snapshot',snap(m)+'<div class="big"><div><b>'+m.ful+'%</b><span>Fulfilment, +'+(m.ful-b.ful)+' pts vs baseline</span></div><div><b>'+m.wst+'%</b><span>Wastage, −'+(b.wst-m.wst)+' pts</span></div><div><b>'+m.eta+' min</b><span>Delivery, −'+(b.eta-m.eta)+' min</span></div></div>')+'</div>'+card('Fine tune',ctrl());
+}
+function pRp(l,m){
+  var se=[{n:'Manual baseline',c:'#b9a0a5',v:[9,14,7]},{n:'HemoSync plan',c:'#d2042d',v:[3,4,2]}];
+  return '<div class="two">'+card('Fulfilment as demand rises',ln())+card('Typical wastage by component (%)',vb(COMP,se,20))+'</div>'+card('Baseline compared with plan','<div class="tw">'+tabH('cmp',l,m)+'</div>');
+}
+var M={rec:'Recommendations',inv:'Inventory',cmp:'Comparison',snap:'Evaluation snapshot'};
+function fac(i){
+  st.sel=i;var h=H[i],n=COMP.reduce(function(a,c){return a+h.s[c]},0),low=h.s['Red cells']<20,b='';
+  COMP.forEach(function(c,j){b+='<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin:8px 0"><span style="width:62px">'+c+'</span><div class="bar" style="flex:1"><i style="width:'+Math.min(100,h.s[c]/60*100)+'%;background:'+CC[j]+'"></i></div><b>'+h.s[c]+'</b></div>'});
+  $('fac').innerHTML='<h3>Selected hospital</h3><b style="font-size:17px;color:var(--maroon)">'+h.n+'</b><div style="margin:6px 0 12px"><span class="pill" style="background:'+(low?'#6b0f1a':'#c93a55')+'">'+(low?'Low red cells':'Stable')+'</span></div><div class="big" style="grid-template-columns:1fr 1fr"><div><b>'+n+'</b><span>units in stock</span></div><div><b>'+h.exp+' days</b><span>soonest expiry</span></div></div><h3 style="margin-top:14px">Stock by component</h3>'+b+'<button class="btn" data-m="inv" style="width:100%;margin-top:8px">View inventory detail</button>';
+}
+function tip(i){
+  var h=H[i],n=COMP.reduce(function(a,c){return a+h.s[c]},0),low=h.s['Red cells']<20,l=plan(true),out=0,inn=0,rt=0,bl=0;
+  l.forEach(function(r){if(r.f==i)out+=r.u;if(r.t==i)inn+=r.u});
+  R.forEach(function(r){if(r[0]==i||r[1]==i){rt++;if(st.cut&&(r[0]==1||r[1]==1))bl++}});
+  var b=COMP.map(function(c,j){return '<div class="tr"><span>'+c+'</span><div class="bar"><i style="width:'+Math.min(100,h.s[c]/60*100)+'%;background:'+CC[j]+'"></i></div><b>'+h.s[c]+'</b></div>'}).join('');
+  return '<div class="tt"><b class="tn">'+h.n+'</b><span class="pill" style="background:'+(low?'#6b0f1a':'#c93a55')+'">'+(low?'Low red cells':'Stable')+'</span><div class="tk"><div><b>'+n+'</b><span>units in stock</span></div><div><b>'+h.exp+' days</b><span>soonest expiry</span></div></div>'+b+'<small>Plan: sending '+out+' units, receiving '+inn+' units<br>'+rt+(rt==1?' route':' routes')+(bl?' ('+bl+' blocked)':'')+'</small></div>';
+}
+function mount(id){
+  var el=$(id);
+  if(!window.L){el.innerHTML=map();return}
+  var mp=L.map(id,{scrollWheelZoom:false}),pts=[];
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(mp);
+  R.forEach(function(r){var b=st.cut&&(r[0]==1||r[1]==1);L.polyline([[H[r[0]].la,H[r[0]].ln],[H[r[1]].la,H[r[1]].ln]],{color:b?'#d2042d':'#6b0f1a',weight:4,opacity:.7,dashArray:b?'8 8':null}).addTo(mp).bindTooltip(H[r[0]].n+' to '+H[r[1]].n+(b?' (blocked)':' (open)'),{sticky:true})});
+  H.forEach(function(h,i){
+    var mk=L.circleMarker([h.la,h.ln],{radius:13,color:'#fff',weight:3,fillColor:h.s['Red cells']<20?'#6b0f1a':'#e8546e',fillOpacity:1}).addTo(mp);
+    mk.bindTooltip(tip(i),{direction:'top',offset:[0,-10],opacity:1,className:'hs-tip'});
+    mk.on('click',function(){mk.openTooltip()});
+    pts.push([h.la,h.ln]);
+  });
+  mp.fitBounds(pts,{padding:[30,30]});
+}
+function openM(k){
+  var l=plan(),m=met(l);
+  $('dt').textContent=M[k];
+  $('db').innerHTML=k=='snap'?snap(m):'<div class="tw">'+tabH(k,l,m)+'</div>';
+  $('dl').onclick=function(){dl(k)};
+  $('dlg').showModal();
+}
+function dl(k){
+  var m=met(plan()),b=base(m),r=[];
+  if(k=='snap')r=[['Measure','Manual baseline','HemoSync plan'],['Fulfilment %',b.ful,m.ful],['Wastage %',b.wst,m.wst],['Avg delivery (min)',b.eta,m.eta]];
+  else document.querySelectorAll('#db tr').forEach(function(t){r.push([].map.call(t.children,function(c){return c.textContent.trim()}))});
+  var csv=r.map(function(x){return x.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\r\n'),a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='hemosync-'+k+'.csv';a.click();
+}
+function report(){
+  var l=plan(true),m=met(l),b=base(m),now=new Date().toLocaleString(),
+    scen='Demand surge +'+st.surge+'%, '+(st.cut?'Amber Fort route blocked':'all routes open'),
+    sum=[['Requests fulfilled (%)',b.ful,m.ful],['Units wasted (%)',b.wst,m.wst],['Average delivery time (min)',b.eta,m.eta],['Units to move','-',m.tot]],
+    stock=H.map(function(h){var n=COMP.reduce(function(a,c){return a+h.s[c]},0);return [h.n,h.s['Red cells'],h.s.Platelets,h.s.Plasma,n,h.exp+(h.exp==1?' day':' days'),h.s['Red cells']<20?'Low red cells':'Stable']}),
+    moves=l.map(function(r){return [H[r.f].n,H[r.t].n,r.c,r.u,r.urg,r.eta+' min']}),
+    routes=R.map(function(r){var bk=st.cut&&(r[0]==1||r[1]==1);return [H[r[0]].n,H[r[1]].n,bk?'Blocked':'Open']});
+  var J=window.jspdf&&window.jspdf.jsPDF;
+  if(!J){
+    var rows=[['HemoSync network report'],['Generated',now],['Scenario',scen],[],['Measure','Manual baseline','HemoSync plan']].concat(sum,[[],['Hospital','Red cells','Platelets','Plasma','Total','Soonest expiry','Status']],stock,[[],['From','To','Component','Units','Urgency','Delivery']],moves,[[],['Route A','Route B','Status']],routes);
+    var csv=rows.map(function(x){return x.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\r\n'),a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='hemosync-report.csv';a.click();
+    return;
+  }
+  var d=new J({unit:'pt',format:'a4'}),y=118,hs={fillColor:[210,4,45],textColor:255},st2={fontSize:9,cellPadding:5,textColor:[43,11,17]};
+  d.setFont('helvetica','bold');d.setFontSize(22);d.setTextColor(107,15,26);d.text('HemoSync - Network Report',40,52);
+  d.setFont('helvetica','normal');d.setFontSize(10);d.setTextColor(125,90,96);d.text('Generated: '+now,40,70);d.text('Scenario: '+scen,40,84);
+  function sec(t,h,bd){
+    if(y>720){d.addPage();y=50}
+    d.setFont('helvetica','bold');d.setFontSize(13);d.setTextColor(107,15,26);d.text(t,40,y);
+    d.autoTable({startY:y+8,head:[h],body:bd,theme:'grid',headStyles:hs,styles:st2,alternateRowStyles:{fillColor:[253,230,234]},margin:{left:40,right:40}});
+    y=d.lastAutoTable.finalY+26;
+  }
+  sec('Key results',['Measure','Manual baseline','HemoSync plan'],sum);
+  sec('Stock at each hospital',['Hospital','Red cells','Platelets','Plasma','Total','Soonest expiry','Status'],stock);
+  sec('Recommended transfers',['From','To','Component','Units','Urgency','Delivery'],moves.length?moves:[['No transfers needed','','','','','']]);
+  sec('Delivery routes',['Hospital A','Hospital B','Status'],routes);
+  var n=d.getNumberOfPages();
+  for(var i=1;i<=n;i++){d.setPage(i);d.setFont('helvetica','normal');d.setFontSize(8);d.setTextColor(125,90,96);d.text('Synthetic data. Planning tool only, not for clinical decisions.  Page '+i+' of '+n,40,820)}
+  d.save('hemosync-report.pdf');
+}
+function go(p){
+  if(p)st.page=p;
+  var l=plan(),m=met(l),pg=PG.filter(function(x){return x[0]==st.page})[0],f={ov:pOv,inv:pInv,al:pAl,tr:pTr,hn:pHn,dm:pDm,sim:pSim,rp:pRp}[st.page];
+  $('main').innerHTML='<div class="hd"><div><h1>'+pg[1].replace('&','&amp;')+'</h1><p class="sub">'+pg[2]+'</p></div>'+((st.page=='ov'||st.page=='rp')?'<button class="btn dlr" id="rep">Download report (PDF)</button>':'')+'</div>'+f(l,m);
+  if($('rep'))$('rep').onclick=report;
+  document.querySelectorAll('#nav button').forEach(function(b){b.setAttribute('aria-current',b.dataset.p==st.page?'page':'false')});
+  if($('comp'))$('comp').value=st.comp;
+  if($('lm'))mount('lm');
+  if($('fac'))fac(st.sel);
+  if($('surge'))$('surge').oninput=function(){$('sv').textContent=this.value+'%'};
+  if($('run'))$('run').onclick=function(){st.surge=+$('surge').value;st.comp=$('comp').value;st.cut=$('cut').checked;go()};
+  document.querySelectorAll('[role=tab]').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('[role=tab]').forEach(function(x){x.setAttribute('aria-selected',x==b)});
+    st.tab=b.dataset.t;$('panel').innerHTML=tabH(st.tab,l,m)}});
+  document.querySelectorAll('[data-pre]').forEach(function(b){b.onclick=function(){var x=PRE[+b.dataset.pre];st.surge=x[2];st.cut=x[3];go()}});
+}
+$('nav').innerHTML=PG.map(function(x){return '<button data-p="'+x[0]+'">'+x[1].replace('&','&amp;')+'</button>'}).join('');
+document.querySelectorAll('#nav button').forEach(function(b){b.onclick=function(){go(b.dataset.p)}});
+$('main').onclick=function(e){var b=e.target.closest('[data-m]');if(b)openM(b.dataset.m)};
+$('dx').onclick=function(){$('dlg').close()};
+$('dlg').onclick=function(e){if(e.target==$('dlg'))$('dlg').close()};
+go();
+</script>
+</body>
+</html>
