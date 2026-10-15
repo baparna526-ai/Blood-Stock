@@ -109,4 +109,4 @@ def test_locked_unit_is_not_free():
     w["locked"].append({"unit_id": "U02", "request_id": "R02"})
     ok, reason = is_feasible(u2, r, w)
     assert ok is False
-    assert "locked" in reason    
+    assert "locked" in reason
