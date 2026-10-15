@@ -96,3 +96,22 @@ def check_timing(unit, request, world, buffer=10):
 
     return True, (f"arrives at minute {arrival}: {expiry_spare} min before expiry, "
                   f"{deadline_spare} min before deadline")
+
+def is_feasible(unit, request, world, buffer=10):
+    ok, reason = check_compatible(unit, request)
+    if not ok:
+        return False, reason
+
+    ok, reason = check_free(unit)
+    if not ok:
+        return False, reason
+
+    ok, reason = check_route(unit, request, world)
+    if not ok:
+        return False, reason
+
+    ok, reason = check_timing(unit, request, world, buffer)
+    if not ok:
+        return False, reason
+
+    return True, reason
